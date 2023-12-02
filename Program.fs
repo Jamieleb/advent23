@@ -3,6 +3,7 @@
 open System
 open System.IO
 open DayOne
+open DayTwo
 
 let tap sideEffect x =
     sideEffect x
@@ -13,6 +14,7 @@ let solve puzzle =
 
     match puzzle with
     | "dayOne" -> printfn "%A" (DayOne.solve input)
+    | "dayTwo" -> printfn "%A" (DayTwo.solve2 input)
     | _ -> printfn "%A" "Puzzle not found"
 
     ()
