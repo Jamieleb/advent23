@@ -125,11 +125,12 @@ let minCubes (game: Game) =
 
 let powerOfReveal reveal = reveal.Red * reveal.Blue * reveal.Green
 
+let gameMinCubesPower =
+    gameOpt >> (Option.map minCubes) >> (Option.map powerOfReveal)
+
 let solve2 input =
     input
     |> Array.toSeq
-    |> Seq.map gameOpt
-    |> Seq.map (Option.map minCubes)
-    |> Seq.map (Option.map powerOfReveal)
+    |> Seq.map gameMinCubesPower
     |> Seq.map (Option.defaultValue 0)
     |> Seq.sum
