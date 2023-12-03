@@ -5,10 +5,6 @@ open System.IO
 open DayOne
 open DayTwo
 
-let tap sideEffect x =
-    sideEffect x
-    x
-
 let solve puzzle =
     let input = File.ReadAllLines $"./input/{puzzle}.txt"
 
