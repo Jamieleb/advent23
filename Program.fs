@@ -11,7 +11,7 @@ let solve puzzle =
     match puzzle with
     | "dayOne" -> printfn "%A" (DayOne.solve input)
     | "dayTwo" -> printfn "%A" (DayTwo.solve2 input)
-    | "dayThree" -> printfn "%A" (DayThree.solve input)
+    | "dayThree" -> printfn "%A" (DayThree.solve2 input)
     | _ -> printfn "%A" "Puzzle not found"
 
     ()

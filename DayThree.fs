@@ -1,7 +1,6 @@
 module DayThree
 
 open System.Text.RegularExpressions
-open Utils.Tap
 
 let sampleInput =
     [| "467..114.."
@@ -18,6 +17,10 @@ let sampleInput =
 let symbolPattern = "[^\d\.]+"
 
 let symbolRegex = Regex symbolPattern
+
+let gearPattern = "\*"
+
+let gearRegex = Regex gearPattern
 
 let numberPattern = "\d+"
 
@@ -49,6 +52,12 @@ let isNumAdjToAnySymbols symPositions numPosition =
     |> Seq.filter (fun { Y = symRow } -> symRow >= numRow - 1 && symRow <= numRow + 1)
     |> Seq.exists (isNumAdjToSymbol numPosition)
 
+let numbersAdjToGear numPositions gearPosition =
+    let { Y = gearRow } = gearPosition
+
+    numPositions
+    |> Seq.filter (fun { Y = numRow } -> numRow >= gearRow - 1 && numRow <= gearRow + 1)
+    |> Seq.filter (fun numPs -> isNumAdjToSymbol numPs gearPosition)
 
 let rowToPosition (rx: Regex) y row =
     row
@@ -96,4 +105,30 @@ let solve input =
     numPositions
     |> Seq.filter (isNumAdjToAnySymbols symPositions)
     |> Seq.map (fun p -> int p.Value)
+    |> Seq.sum
+
+let gearRatio (numPositionSeq: seq<Position>) =
+    match (List.ofSeq numPositionSeq) with
+    | [ numP1; numP2 ] -> int numP1.Value * int numP2.Value
+    | _ -> 0
+
+let solve2 input =
+    let indexedInput = Array.indexed input
+
+    let numPositions =
+        indexedInput
+        |> Array.map (fun (i, row) -> rowToPosition numberRegex i row)
+        |> Seq.ofArray
+        |> Seq.concat
+
+    let gearPositions =
+        indexedInput
+        |> Array.map (fun (i, row) -> rowToPosition gearRegex i row)
+        |> Seq.ofArray
+        |> Seq.concat
+
+    gearPositions
+    |> Seq.map (numbersAdjToGear numPositions)
+    |> Seq.filter (fun nums -> Seq.length nums = 2)
+    |> Seq.map gearRatio
     |> Seq.sum
