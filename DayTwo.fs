@@ -61,10 +61,6 @@ let getReveals (str: string) =
 
 type Game = { Id: int; RevealList: array<Reveal> }
 
-let foo = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
-
-let bar = foo.Split ':'
-
 let getId (str: string) =
     str |> String.filter Char.IsDigit |> int
 
