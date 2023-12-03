@@ -31,11 +31,7 @@ let private getDigits str =
 let private firstAndLast list =
     List.map string [ List.head list; List.last list ]
 
+let private rowToValue = getDigits >> firstAndLast >> (List.fold (+) "") >> int
+
 let solve input =
-    input
-    |> Array.toSeq
-    |> Seq.map getDigits
-    |> Seq.map firstAndLast
-    |> Seq.map (List.fold (+) "")
-    |> Seq.map int
-    |> Seq.sum
+    input |> Array.toSeq |> Seq.map rowToValue |> Seq.sum
