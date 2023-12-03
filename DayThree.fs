@@ -44,22 +44,26 @@ let isNumAdjToSymbol numPosition symPosition =
     |> Set.isEmpty
     |> not
 
+let isAdjRow target position =
+    let { Y = posRow } = position
+    posRow >= target - 1 && posRow <= target + 1
+
+let positionsInAdjRows targetPosition positionSeq =
+    let { Y = targetRow } = targetPosition
+
+    positionSeq |> Seq.filter (isAdjRow targetRow)
 
 let isNumAdjToAnySymbols symPositions numPosition =
-    let { Y = numRow } = numPosition
-
     symPositions
-    |> Seq.filter (fun { Y = symRow } -> symRow >= numRow - 1 && symRow <= numRow + 1)
+    |> positionsInAdjRows numPosition
     |> Seq.exists (isNumAdjToSymbol numPosition)
 
 let numbersAdjToGear numPositions gearPosition =
-    let { Y = gearRow } = gearPosition
-
     numPositions
-    |> Seq.filter (fun { Y = numRow } -> numRow >= gearRow - 1 && numRow <= gearRow + 1)
+    |> positionsInAdjRows gearPosition
     |> Seq.filter (fun numPs -> isNumAdjToSymbol numPs gearPosition)
 
-let rowToPosition (rx: Regex) y row =
+let rowToPosition (rx: Regex) (y, row) =
     row
     |> rx.Matches
     |> Seq.cast
@@ -69,65 +73,34 @@ let rowToPosition (rx: Regex) y row =
           Length = m.Length
           Value = m.Value })
 
-let symbolPositions (rowOne: string, rowTwo: string) =
-    [ 0, rowOne; 1, rowTwo ]
-    |> List.map (fun (y, row) -> rowToPosition symbolRegex y row)
-    |> Seq.concat
+let positionsByRegex rx input =
+    input |> Seq.map (rowToPosition rx) |> Seq.concat
 
-let numPositions (rowOne: string, rowTwo: string) =
-    [ 0, rowOne; 1, rowTwo ]
-    |> List.map (fun (y, row) -> rowToPosition numberRegex y row)
-    |> Seq.concat
-
-let getValidNumsFromRowPair rowPair =
-    let symSet = symbolPositions rowPair
-
-    rowPair
-    |> numPositions
-    |> Seq.filter (isNumAdjToAnySymbols symSet)
-    |> Seq.map (fun p -> int p.Value)
+let inputToIndexedSeq input = input |> Seq.ofArray |> Seq.indexed
 
 let solve input =
-    let indexedInput = Array.indexed input
+    let indexedInput = inputToIndexedSeq input
 
-    let symPositions =
-        indexedInput
-        |> Array.map (fun (i, row) -> rowToPosition symbolRegex i row)
-        |> Seq.ofArray
-        |> Seq.concat
+    let symPositions = positionsByRegex symbolRegex indexedInput
 
-    let numPositions =
-        indexedInput
-        |> Array.map (fun (i, row) -> rowToPosition numberRegex i row)
-        |> Seq.ofArray
-        |> Seq.concat
-
-    numPositions
+    indexedInput
+    |> positionsByRegex numberRegex
     |> Seq.filter (isNumAdjToAnySymbols symPositions)
     |> Seq.map (fun p -> int p.Value)
     |> Seq.sum
 
-let gearRatio (numPositionSeq: seq<Position>) =
-    match (List.ofSeq numPositionSeq) with
+let gearRatio numPositionSeq =
+    match List.ofSeq numPositionSeq with
     | [ numP1; numP2 ] -> int numP1.Value * int numP2.Value
     | _ -> 0
 
 let solve2 input =
-    let indexedInput = Array.indexed input
+    let indexedInput = inputToIndexedSeq input
 
-    let numPositions =
-        indexedInput
-        |> Array.map (fun (i, row) -> rowToPosition numberRegex i row)
-        |> Seq.ofArray
-        |> Seq.concat
+    let numPositions = positionsByRegex numberRegex indexedInput
 
-    let gearPositions =
-        indexedInput
-        |> Array.map (fun (i, row) -> rowToPosition gearRegex i row)
-        |> Seq.ofArray
-        |> Seq.concat
-
-    gearPositions
+    indexedInput
+    |> positionsByRegex gearRegex
     |> Seq.map (numbersAdjToGear numPositions)
     |> Seq.filter (fun nums -> Seq.length nums = 2)
     |> Seq.map gearRatio
