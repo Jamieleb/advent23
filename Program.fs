@@ -2,8 +2,6 @@
 
 open System
 open System.IO
-open DayOne
-open DayTwo
 
 let solve puzzle =
     let input = File.ReadAllLines $"./input/{puzzle}.txt"
@@ -12,6 +10,7 @@ let solve puzzle =
     | "dayOne" -> printfn "%A" (DayOne.solve input)
     | "dayTwo" -> printfn "%A" (DayTwo.solve2 input)
     | "dayThree" -> printfn "%A" (DayThree.solve2 input)
+    | "dayFour" -> printfn "%A" (DayFour.solve input)
     | _ -> printfn "%A" "Puzzle not found"
 
     ()

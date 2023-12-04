@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Utils/Tap.fs" />
+    <Compile Include="Utils/StringUtils.fs" />
+    <Compile Include="DayFour.fs" />
     <Compile Include="DayThree.fs" />
     <Compile Include="DayOne.fs" />
     <Compile Include="DayTwo.fs" />
